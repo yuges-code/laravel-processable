@@ -4,7 +4,7 @@ namespace Yuges\Processable\Observers;
 
 use Yuges\Processable\Models\Stage;
 
-class StageObserver
+class ProcessableObserver
 {
     public function saving(Stage $model): void
     {

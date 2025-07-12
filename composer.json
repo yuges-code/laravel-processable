@@ -1,17 +1,18 @@
 {
-    "name": "yuges-code/laravel-package-template",
-    "description": "🚀 Starter template for all Yuges Laravel packages",
+    "name": "yuges-code/laravel-processable",
+    "description": "⏳Package for easily attaching processes to Laravel eloquent models",
     "keywords": [
         "php",
         "yuges",
         "laravel",
         "package",
-        "template"
+        "template",
+        "processes"
     ],
-    "homepage": "https://yuges-code.github.io/laravel-package-template",
+    "homepage": "https://yuges-code.github.io/laravel-processable",
     "support": {
-        "source": "https://github.com/yuges-code/laravel-package-template",
-        "issues": "https://github.com/yuges-code/laravel-package-template/issues"
+        "source": "https://github.com/yuges-code/laravel-processable",
+        "issues": "https://github.com/yuges-code/laravel-processable/issues"
     },
     "license": "MIT",
     "authors": [
@@ -30,14 +31,14 @@
     },
     "autoload": {
         "psr-4": {
-            "Yuges\\LaravelPackageTemplate\\": "src",
-            "Yuges\\LaravelPackageTemplate\\Database\\Seeders\\": "database/seeders/",
-            "Yuges\\LaravelPackageTemplate\\Database\\Factories\\": "database/factories/"
+            "Yuges\\Processable\\": "src",
+            "Yuges\\Processable\\Database\\Seeders\\": "database/seeders/",
+            "Yuges\\Processable\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yuges\\Package\\Tests\\": "tests/src"
+            "Yuges\\Processable\\Tests\\": "tests/src"
         }
     },
     "scripts": {
@@ -46,7 +47,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Yuges\\LaravelPackageTemplate\\Providers\\TemplateServiceProvider"
+                "Yuges\\Processable\\Providers\\ProcessableServiceProvider"
             ]
         }
     },

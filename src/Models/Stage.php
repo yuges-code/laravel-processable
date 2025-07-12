@@ -16,6 +16,6 @@ class Stage extends Model
 
     public function getTable(): string
     {
-        return Config::getProcessTable() ?? $this->table;
+        return Config::getStageTable() ?? $this->table;
     }
 }
