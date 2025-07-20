@@ -23,7 +23,7 @@ return [
             'key' => Yuges\Package\Enums\KeyType::BigInteger,
             'allowed' => [
                 'classes' => [
-                    \App\Models\User::class,
+                    // \App\Models\User::class,
                 ],
             ],
             'relation' => [
@@ -31,5 +31,22 @@ return [
             ],
             'observer' => Yuges\Processable\Observers\ProcessableObserver::class,
         ],
+    ],
+
+    'actions' => [
+        'stage' => [
+            'create' => Yuges\Processable\Actions\CreateProcessStagesAction::class,
+            'update' => Yuges\Processable\Actions\UpdateProcessStageStateAction::class,
+        ],
+        'process' => [
+            'run' => Yuges\Processable\Actions\RunProcessAction::class,
+            'create' => Yuges\Processable\Actions\CreateProcessAction::class,
+            'update' => Yuges\Processable\Actions\UpdateProcessStateAction::class,
+        ],
+    ],
+
+    'job' => [
+        'class' => Yuges\Processable\Jobs\ProcessStageJob::class,
+        'handler' => Yuges\Processable\Handlers\EventHandler::class
     ],
 ];

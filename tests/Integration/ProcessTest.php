@@ -2,10 +2,9 @@
 
 namespace Yuges\Processable\Tests\Integration;
 
-use Yuges\Processable\Config\Config;
 use Yuges\Processable\Tests\TestCase;
-use Yuges\Processable\Models\Process;
 use Yuges\Processable\Tests\Stubs\Models\Post;
+use Yuges\Processable\Tests\Stubs\Processes\TestProcess;
 
 class ProcessTest extends TestCase
 {
@@ -20,8 +19,8 @@ class ProcessTest extends TestCase
             'title' => 'New post',
         ]);
 
-        // $process = Process::query()->create([
-        //     'name' => 'programming',
-        // ]);
+        $process = $post->process(TestProcess::class);
+
+        $process->refresh();
     }
 }

@@ -11,5 +11,8 @@ class UpdateProcessStateAction
     ) {
     }
 
-    
+    public static function create(Processable $processable): self
+    {
+        return new static($processable);
+    }
 }

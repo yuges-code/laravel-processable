@@ -9,5 +9,5 @@ interface Processable
 {
     public function processes(): MorphMany;
 
-    public function process(Process $process): static;
+    public function process(string $process): Process;
 }

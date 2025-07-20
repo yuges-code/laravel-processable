@@ -31,7 +31,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('class');
-            $table->string('state')->default(ProcessStatesEnum::PENDING);
+            $table->unsignedTinyInteger('state')->default(ProcessStatesEnum::PENDING);
 
             $table->timestamps();
         });

@@ -6,6 +6,8 @@ use Yuges\Processable\Models\Process as ProcessModel;
 
 abstract class Process implements \Yuges\Processable\Interfaces\Process
 {
+    protected $name = 'Process';
+
     public function stages(): array
     {
         return [];

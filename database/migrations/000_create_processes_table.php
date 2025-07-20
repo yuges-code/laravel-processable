@@ -25,8 +25,8 @@ return new class extends Migration
             $table->key(Config::getProcessKeyType(KeyType::BigInteger));
 
             $table->string('class');
-            $table->longText('payload');
-            $table->string('state')->default(ProcessStatesEnum::PENDING);
+            $table->longText('payload')->nullable();
+            $table->unsignedTinyInteger('state')->default(ProcessStatesEnum::PENDING);
 
             $table->keyMorphs(
                 Config::getProcessableKeyType(KeyType::BigInteger),

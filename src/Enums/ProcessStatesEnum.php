@@ -2,17 +2,17 @@
 
 namespace Yuges\Processable\Enums;
 
-enum ProcessStatesEnum: string
+enum ProcessStatesEnum: int
 {
-    case PENDING = 'pending';
-    case STARTED = 'started';
-    case PROCESSING = 'processing';
-    case WAITING = 'waiting';
-    case RESUME = 'resume';
-    case COMPLETED = 'completed';
-    case FAILED = 'failed';
-    case ABORTED = 'aborted';
-    case SKIPPED = 'skipped';
+    case PENDING = 10;
+    case STARTED = 20;
+    case PROCESSING = 30;
+    case WAITING = 40;
+    case RESUME = 50;
+    case COMPLETED = 60;
+    case FAILED = 70;
+    case ABORTED = 80;
+    case SKIPPED = 90;
 
     public function getLabel(): string
     {

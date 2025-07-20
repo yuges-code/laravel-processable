@@ -8,8 +8,14 @@ use Yuges\Processable\Models\Stage;
 use Yuges\Processable\Models\Process;
 use Yuges\Processable\Interfaces\Processable;
 use Yuges\Processable\Observers\StageObserver;
+use Yuges\Processable\Actions\RunProcessAction;
 use Yuges\Processable\Observers\ProcessObserver;
+use Yuges\Processable\Actions\CreateProcessAction;
 use Yuges\Processable\Observers\ProcessableObserver;
+use Yuges\Processable\Actions\UpdateProcessStateAction;
+use Yuges\Processable\Actions\CreateProcessStagesAction;
+use Yuges\Processable\Actions\UpdateProcessStageStateAction;
+use Yuges\Processable\Jobs\ProcessStageJob;
 
 class Config extends \Yuges\Package\Config\Config
 {
@@ -81,5 +87,88 @@ class Config extends \Yuges\Package\Config\Config
     public static function getProcessableObserverClass(mixed $default = null): string
     {
         return self::get('models.processable.observer', $default);
+    }
+
+    public static function getRunProcessAction(
+        Processable $processable,
+        mixed $default = null
+    ): RunProcessAction
+    {
+        return self::getRunProcessActionClass($default)::create($processable);
+    }
+
+    /** @return class-string<RunProcessAction> */
+    public static function getRunProcessActionClass(mixed $default = null): string
+    {
+        return self::get('actions.process.run', $default);
+    }
+
+    public static function getCreateProcessAction(
+        Processable $processable,
+        mixed $default = null
+    ): CreateProcessAction
+    {
+        return self::getCreateProcessActionClass($default)::create($processable);
+    }
+
+    /** @return class-string<CreateProcessAction> */
+    public static function getCreateProcessActionClass(mixed $default = null): string
+    {
+        return self::get('actions.process.create', $default);
+    }
+
+    public static function getUpdateProcessAction(
+        Processable $processable,
+        mixed $default = null
+    ): UpdateProcessStateAction
+    {
+        return self::getUpdateProcessActionClass($default)::create($processable);
+    }
+
+    /** @return class-string<UpdateProcessStateAction> */
+    public static function getUpdateProcessActionClass(mixed $default = null): string
+    {
+        return self::get('actions.process.update', $default);
+    }
+
+    public static function getCreateProcessStagesAction (
+        Processable $processable,
+        mixed $default = null
+    ): CreateProcessStagesAction
+    {
+        return self::getCreateProcessStagesActionClass($default)::create($processable);
+    }
+
+    /** @return class-string<CreateProcessStagesAction> */
+    public static function getCreateProcessStagesActionClass(mixed $default = null): string
+    {
+        return self::get('actions.stage.create', $default);
+    }
+
+    public static function getUpdateProcessStageAction (
+        Processable $processable,
+        mixed $default = null
+    ): UpdateProcessStageStateAction
+    {
+        return self::getUpdateProcessStageActionClass($default)::create($processable);
+    }
+
+    /** @return class-string<UpdateProcessStageStateAction> */
+    public static function getUpdateProcessStageActionClass(mixed $default = null): string
+    {
+        return self::get('actions.stage.update', $default);
+    }
+
+    public static function getProcessStageJob(Stage $stage, mixed $default = null): ProcessStageJob
+    {
+        $job = self::getProcessStageJobClass();
+
+        return new $job($stage);
+    }
+
+    /** @return class-string<ProcessStageJob> */
+    public static function getProcessStageJobClass(mixed $default = null): string
+    {
+        return self::get('job.class', $default);
     }
 }

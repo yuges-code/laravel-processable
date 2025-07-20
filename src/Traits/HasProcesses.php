@@ -7,6 +7,7 @@ use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Yuges\Processable\Interfaces\Process as ProcessInterface;
 
 /**
  * @property Collection<array-key, Process> $processes
@@ -23,13 +24,15 @@ trait HasProcesses
             );
     }
 
-    public function process(Process $process): static
+    /**
+     * @param class-string<ProcessInterface>
+     */
+    public function process(string $process): Process
     {
-        return $this;
-    }
+        $process = new $process();
 
-    public function unprocess(Process $process): static
-    {
-        return $this;
+        return Config::getRunProcessAction($this)->execute(
+            Config::getCreateProcessAction($this)->execute($process)
+        );
     }
 }
