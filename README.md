@@ -39,7 +39,7 @@
 </div>
 
 <div align="center">
-    <h3>📌 Package for easily attaching processes to Laravel eloquent models</h3>
+    <h3>⏳ Package for easily attaching processes to Laravel eloquent models</h3>
 </div>
 
 <br>
