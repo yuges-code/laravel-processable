@@ -1,6 +1,7 @@
 <?php
 
 use Yuges\Package\Enums\KeyType;
+use Yuges\Processable\Models\Batch;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
 use Yuges\Package\Database\Schema\Schema;
@@ -32,6 +33,13 @@ return new class extends Migration
                 Config::getProcessableKeyType(KeyType::BigInteger),
                 Config::getProcessableRelationName('processable')
             );
+
+            $table
+                ->foreignIdFor(Config::getBatchClass(Batch::class))
+                ->nullable()
+                ->constrained()
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
 
             $table->timestamp('reserved_at')->nullable();
             $table->timestamp('available_at')->nullable();

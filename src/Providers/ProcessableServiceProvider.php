@@ -2,19 +2,17 @@
 
 namespace Yuges\Processable\Providers;
 
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobProcessing;
 use Yuges\Package\Data\Package;
 use Yuges\Processable\Models\Stage;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
+use Illuminate\Support\Facades\Queue;
 use Yuges\Processable\Observers\StageObserver;
 use Yuges\Processable\Exceptions\InvalidStage;
 use Yuges\Processable\Observers\ProcessObserver;
 use Yuges\Processable\Exceptions\InvalidProcess;
+use Yuges\Processable\Handlers\StageEventHandler;
 use Yuges\Package\Providers\PackageServiceProvider;
-use Illuminate\Support\Facades\Queue;
-use Yuges\Processable\Jobs\ProcessStageJob;
 
 class ProcessableServiceProvider extends PackageServiceProvider
 {
@@ -46,20 +44,10 @@ class ProcessableServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        Queue::before(function (JobProcessing $event) {
-            $payload = $event->job->payload();
+        $handler = Config::getStageEventHandler(StageEventHandler::class);
 
-            $job = unserialize($payload['data']['command']);
-
-            if (! $job instanceof ProcessStageJob) {
-                return;
-            }
-        });
-
-        Queue::after(function (JobProcessed $event) {
-            // $event->connectionName
-            // $event->job
-            // $event->job->payload()
-        });
+        Queue::before($handler->before(...));
+        Queue::after($handler->after(...));
+        Queue::failing($handler->failing(...));
     }
 }

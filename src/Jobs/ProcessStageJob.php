@@ -4,8 +4,10 @@ namespace Yuges\Processable\Jobs;
 
 use Illuminate\Bus\Batchable;
 use Yuges\Processable\Models\Stage;
+use Yuges\Processable\Config\Config;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Yuges\Processable\Enums\ProcessStatesEnum;
 
 class ProcessStageJob implements ShouldQueue
 {
@@ -22,12 +24,16 @@ class ProcessStageJob implements ShouldQueue
         }
 
         $stage = new $this->stage->class;
-        
+
+        Config::getUpdateProcessStageAction($this->stage)->execute(ProcessStatesEnum::PROCESSING);
+
         $stage->execute();
+
+        Config::getUpdateProcessStageAction($this->stage)->execute(ProcessStatesEnum::PROCESSED);
     }
 
-    public function failed()
+    public function getStage(): Stage
     {
-
+        return $this->stage;
     }
 }

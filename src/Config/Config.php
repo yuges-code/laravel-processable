@@ -3,23 +3,48 @@
 namespace Yuges\Processable\Config;
 
 use Yuges\Package\Enums\KeyType;
+use Yuges\Processable\Models\Job;
 use Illuminate\Support\Collection;
 use Yuges\Processable\Models\Stage;
+use Yuges\Processable\Models\Batch;
 use Yuges\Processable\Models\Process;
+use Yuges\Processable\Jobs\ProcessStageJob;
 use Yuges\Processable\Interfaces\Processable;
 use Yuges\Processable\Observers\StageObserver;
 use Yuges\Processable\Actions\RunProcessAction;
 use Yuges\Processable\Observers\ProcessObserver;
+use Yuges\Processable\Handlers\StageEventHandler;
 use Yuges\Processable\Actions\CreateProcessAction;
 use Yuges\Processable\Observers\ProcessableObserver;
 use Yuges\Processable\Actions\UpdateProcessStateAction;
 use Yuges\Processable\Actions\CreateProcessStagesAction;
 use Yuges\Processable\Actions\UpdateProcessStageStateAction;
-use Yuges\Processable\Jobs\ProcessStageJob;
 
 class Config extends \Yuges\Package\Config\Config
 {
     const string NAME = 'processable';
+
+    public static function getJobTable(mixed $default = null): string
+    {
+        return self::get('models.job.table', $default);
+    }
+
+    /** @return class-string<Job> */
+    public static function getJobClass(mixed $default = null): string
+    {
+        return self::get('models.job.class', $default);
+    }
+
+    public static function getBatchTable(mixed $default = null): string
+    {
+        return self::get('models.batch.table', $default);
+    }
+
+    /** @return class-string<Batch> */
+    public static function getBatchClass(mixed $default = null): string
+    {
+        return self::get('models.batch.class', $default);
+    }
 
     public static function getProcessTable(mixed $default = null): string
     {
@@ -146,11 +171,11 @@ class Config extends \Yuges\Package\Config\Config
     }
 
     public static function getUpdateProcessStageAction (
-        Processable $processable,
+        Stage $stage,
         mixed $default = null
     ): UpdateProcessStageStateAction
     {
-        return self::getUpdateProcessStageActionClass($default)::create($processable);
+        return self::getUpdateProcessStageActionClass($default)::create($stage);
     }
 
     /** @return class-string<UpdateProcessStageStateAction> */
@@ -170,5 +195,16 @@ class Config extends \Yuges\Package\Config\Config
     public static function getProcessStageJobClass(mixed $default = null): string
     {
         return self::get('job.class', $default);
+    }
+
+    public static function getStageEventHandler(mixed $default = null): StageEventHandler
+    {
+        return self::getStageEventHandlerClass($default)::create();
+    }
+
+    /** @return class-string<StageEventHandler> */
+    public static function getStageEventHandlerClass(mixed $default = null): string
+    {
+        return self::get('job.handler.stage', $default);
     }
 }

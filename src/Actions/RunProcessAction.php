@@ -8,6 +8,7 @@ use Yuges\Processable\Models\Stage;
 use Illuminate\Support\Facades\Bus;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
+use Yuges\Processable\Jobs\ProcessStageJob;
 use Yuges\Processable\Interfaces\Processable;
 use Yuges\Processable\Enums\ProcessStatesEnum;
 
@@ -27,17 +28,20 @@ class RunProcessAction
     {
         Bus::batch(
             $model->stages->map(function (Stage $stage) {
-                return Config::getProcessStageJob($stage);
+                return Config::getProcessStageJob($stage, ProcessStageJob::class);
             })
-        )->before(function (Batch $batch) {
-
+        )->before(function (Batch $batch) use ($model) {
+            $model->update([
+                'batch_id' => $batch->id,
+                'state' => ProcessStatesEnum::STARTED,
+            ]);
         })->progress(function (Batch $batch) use ($model) {
 
         })->catch(function (Batch $batch, Throwable $e) {
 
         })->finally(function (Batch $batch) use ($model) {
             $model->update([
-                'state' => ProcessStatesEnum::COMPLETED,
+                'state' => ProcessStatesEnum::FINISHED,
             ]);
         })->dispatch();
 

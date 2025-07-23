@@ -7,17 +7,25 @@ return [
      * FQCN (Fully Qualified Class Name) of the models to use for process
      */
     'models' => [
-        'process' => [
-            'key' => Yuges\Package\Enums\KeyType::BigInteger,
-            'table' => 'processes',
-            'class' => Yuges\Processable\Models\Process::class,
-            'observer' => Yuges\Processable\Observers\ProcessObserver::class,
+        'job' => [
+            'table' => 'jobs',
+            'class' => Yuges\Processable\Models\Job::class,
+        ],
+        'batch' => [
+            'table' => 'job_batches',
+            'class' => Yuges\Processable\Models\Batch::class,
         ],
         'stage' => [
             'key' => Yuges\Package\Enums\KeyType::BigInteger,
             'table' => 'process_stages',
             'class' => Yuges\Processable\Models\Stage::class,
             'observer' => Yuges\Processable\Observers\StageObserver::class,
+        ],
+        'process' => [
+            'key' => Yuges\Package\Enums\KeyType::BigInteger,
+            'table' => 'processes',
+            'class' => Yuges\Processable\Models\Process::class,
+            'observer' => Yuges\Processable\Observers\ProcessObserver::class,
         ],
         'processable' => [
             'key' => Yuges\Package\Enums\KeyType::BigInteger,
@@ -47,6 +55,9 @@ return [
 
     'job' => [
         'class' => Yuges\Processable\Jobs\ProcessStageJob::class,
-        'handler' => Yuges\Processable\Handlers\EventHandler::class
+        'handler' => [
+            'stage' => Yuges\Processable\Handlers\StageEventHandler::class,
+            'process' => Yuges\Processable\Handlers\StageEventHandler::class,
+        ],
     ],
 ];

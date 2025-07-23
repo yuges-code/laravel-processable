@@ -7,6 +7,7 @@ use Yuges\Processable\Config\Config;
 use Yuges\Processable\Traits\HasState;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Yuges\Processable\Interfaces\Process as ProcessInterface;
 
@@ -30,5 +31,10 @@ class Process extends Model
     public function stages(): HasMany
     {
         return $this->hasMany(Config::getStageClass(Stage::class));
+    }
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(Config::getBatchClass(Batch::class));
     }
 }

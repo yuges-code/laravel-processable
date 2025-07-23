@@ -1,6 +1,7 @@
 <?php
 
 use Yuges\Package\Enums\KeyType;
+use Yuges\Processable\Models\Job;
 use Yuges\Processable\Models\Stage;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
@@ -29,6 +30,13 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
+
+            $table
+                ->foreignIdFor(Config::getJobClass(Job::class))
+                ->nullable()
+                ->constrained()
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
 
             $table->string('class');
             $table->unsignedTinyInteger('state')->default(ProcessStatesEnum::PENDING);

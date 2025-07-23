@@ -2,6 +2,7 @@
 
 namespace Yuges\Processable\Tests\Integration;
 
+use Yuges\Processable\Models\Job;
 use Yuges\Processable\Tests\TestCase;
 use Yuges\Processable\Tests\Stubs\Models\Post;
 use Yuges\Processable\Tests\Stubs\Processes\TestProcess;
@@ -20,7 +21,5 @@ class ProcessTest extends TestCase
         ]);
 
         $process = $post->process(TestProcess::class);
-
-        $process->refresh();
     }
 }
