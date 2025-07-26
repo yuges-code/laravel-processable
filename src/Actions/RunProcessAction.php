@@ -27,8 +27,8 @@ class RunProcessAction
     public function execute(Process $model): Process
     {
         Bus::batch(
-            $model->stages->map(function (Stage $stage) {
-                return Config::getProcessStageJob($stage, ProcessStageJob::class);
+            $model->stages->map(function (Stage $stage) use ($model) {
+                return Config::getProcessStageJob($stage, $model, $this->processable, ProcessStageJob::class);
             })
         )->before(function (Batch $batch) use ($model) {
             $model->update([

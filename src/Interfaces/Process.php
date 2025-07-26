@@ -9,4 +9,8 @@ interface Process
     public function stages(): array;
 
     static function process(): ProcessModel;
+
+    public function getName(): string;
+
+    public function setName(string $name): self;
 }

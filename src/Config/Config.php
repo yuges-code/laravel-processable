@@ -184,11 +184,16 @@ class Config extends \Yuges\Package\Config\Config
         return self::get('actions.stage.update', $default);
     }
 
-    public static function getProcessStageJob(Stage $stage, mixed $default = null): ProcessStageJob
+    public static function getProcessStageJob(
+        Stage $stage,
+        Process $process,
+        Processable $processable,
+        mixed $default = null
+    ): ProcessStageJob
     {
-        $job = self::getProcessStageJobClass();
+        $job = self::getProcessStageJobClass($default);
 
-        return new $job($stage);
+        return new $job($stage, $process, $processable);
     }
 
     /** @return class-string<ProcessStageJob> */

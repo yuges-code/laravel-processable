@@ -8,6 +8,6 @@ class StageTwo extends Stage
 {
     public function execute()
     {
-        return 40*50;
+        40*50;
     }
 }
