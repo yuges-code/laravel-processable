@@ -40,6 +40,13 @@ class Config extends \Yuges\Package\Config\Config
         return self::get('models.batch.table', $default);
     }
 
+    public static function getBatch(mixed $default = null): Batch
+    {
+        $batch = self::getBatchClass($default);
+
+        return new $batch;
+    }
+
     /** @return class-string<Batch> */
     public static function getBatchClass(mixed $default = null): string
     {

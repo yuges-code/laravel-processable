@@ -34,10 +34,11 @@ return new class extends Migration
                 Config::getProcessableRelationName('processable')
             );
 
+            $table->string(Config::getBatch(Batch::class)->getForeignKey())->nullable();
             $table
-                ->foreignIdFor(Config::getBatchClass(Batch::class))
-                ->nullable()
-                ->constrained()
+                ->foreign(Config::getBatch(Batch::class)->getForeignKey())
+                ->references('id')
+                ->on(Config::getBatchClass(Batch::class)::getTableName())
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
 
