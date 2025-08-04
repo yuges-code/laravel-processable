@@ -8,9 +8,9 @@ use Yuges\Processable\Models\Stage;
 use Illuminate\Support\Facades\Bus;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
+use Yuges\Processable\Enums\ProcessState;
 use Yuges\Processable\Jobs\ProcessStageJob;
 use Yuges\Processable\Interfaces\Processable;
-use Yuges\Processable\Enums\ProcessStatesEnum;
 
 class RunProcessAction
 {
@@ -33,7 +33,7 @@ class RunProcessAction
         )->before(function (Batch $batch) use ($model) {
             $model->update([
                 'batch_id' => $batch->id,
-                'state' => ProcessStatesEnum::STARTED,
+                'state' => ProcessState::Started,
             ]);
         })->progress(function (Batch $batch) use ($model) {
 
@@ -41,7 +41,7 @@ class RunProcessAction
 
         })->finally(function (Batch $batch) use ($model) {
             $model->update([
-                'state' => ProcessStatesEnum::FINISHED,
+                'state' => ProcessState::Finished,
             ]);
         })->dispatch();
 

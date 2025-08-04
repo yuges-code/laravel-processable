@@ -2,17 +2,17 @@
 
 namespace Yuges\Processable\Traits;
 
-use Yuges\Processable\Enums\ProcessStatesEnum;
+use Yuges\Processable\Enums\ProcessState;
 
 /**
- * @property ProcessStatesEnum $state
+ * @property ProcessState $state
  */
 trait HasState
 {
     public function initializeHasState()
     {
         $this->mergeCasts([
-            'state' => ProcessStatesEnum::class,
+            'state' => ProcessState::class,
         ]);
     }
 }

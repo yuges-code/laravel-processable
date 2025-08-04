@@ -5,9 +5,9 @@ use Yuges\Processable\Models\Job;
 use Yuges\Processable\Models\Stage;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
+use Yuges\Processable\Enums\ProcessState;
 use Yuges\Package\Database\Schema\Schema;
 use Yuges\Package\Database\Schema\Blueprint;
-use Yuges\Processable\Enums\ProcessStatesEnum;
 use Yuges\Package\Database\Migrations\Migration;
 
 return new class extends Migration
@@ -39,7 +39,7 @@ return new class extends Migration
                 ->nullOnDelete();
 
             $table->string('class');
-            $table->unsignedTinyInteger('state')->default(ProcessStatesEnum::PENDING);
+            $table->unsignedTinyInteger('state')->default(ProcessState::Pending);
 
             $table->timestamps();
         });

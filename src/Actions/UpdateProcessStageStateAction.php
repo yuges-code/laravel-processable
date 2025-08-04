@@ -3,7 +3,7 @@
 namespace Yuges\Processable\Actions;
 
 use Yuges\Processable\Models\Stage;
-use Yuges\Processable\Enums\ProcessStatesEnum;
+use Yuges\Processable\Enums\ProcessState;
 
 class UpdateProcessStageStateAction
 {
@@ -17,7 +17,7 @@ class UpdateProcessStageStateAction
         return new static($stage);
     }
 
-    public function execute(ProcessStatesEnum $state, ?string $jobId = null): Stage
+    public function execute(ProcessState $state, ?string $jobId = null): Stage
     {
         $this->stage->update([
             'state' => $state,

@@ -4,8 +4,8 @@ namespace Yuges\Processable\Actions;
 
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
+use Yuges\Processable\Enums\ProcessState;
 use Yuges\Processable\Interfaces\Processable;
-use Yuges\Processable\Enums\ProcessStatesEnum;
 use Yuges\Processable\Interfaces\Process as ProcessInterface;
 
 class CreateProcessAction
@@ -24,7 +24,7 @@ class CreateProcessAction
     {
         $model = $this->processable->processes()->create([
             'class' => $process::class,
-            'state' => ProcessStatesEnum::PENDING,
+            'state' => ProcessState::Pending,
         ]);
 
         return Config::getCreateProcessStagesAction($this->processable)->execute($model);
