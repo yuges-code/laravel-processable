@@ -31,28 +31,28 @@ class RunProcessAction
     {
         $process = new $model->class;
 
-        Bus::batch(
-            Collection::make($process->stages())->map(function (string $stage) use ($model) {
-                $stage = new $stage;
+        $jobs = Collection::make($process->stages())->map(function (string $stage) use ($model) {
+            $stage = new $stage;
 
-                if (! $stage instanceof InterfacesStage) {
-                    throw new Exception('Error stage type');
-                }
+            if (! $stage instanceof InterfacesStage) {
+                throw new Exception('Error stage type');
+            }
 
-                $stage = $model->stages->firstWhere('class', '=', $stage::class);
+            $stage = $model->stages->firstWhere('class', '=', $stage::class);
 
-                if (! $stage instanceof Stage) {
-                    throw new Exception('Error stage type');
-                }
+            if (! $stage instanceof Stage) {
+                throw new Exception('Error stage type');
+            }
 
-                return Config::getProcessStageJob(
-                    $stage,
-                    $model,
-                    $this->processable,
-                    ProcessStageJob::class
-                );
-            })
-        )->before(function (Batch $batch) use ($model) {
+            return Config::getProcessStageJob(
+                $stage,
+                $model,
+                $this->processable,
+                ProcessStageJob::class
+            );
+        });
+
+        Bus::batch([$jobs->toArray()])->before(function (Batch $batch) use ($model) {
             $model->update([
                 'batch_id' => $batch->id,
                 'state' => ProcessState::Started,
