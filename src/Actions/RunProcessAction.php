@@ -66,7 +66,6 @@ class RunProcessAction
                 'state' => ProcessState::Finished,
             ]);
         })
-        ->onQueue('processes')
         ->dispatch();
 
         return $model;
