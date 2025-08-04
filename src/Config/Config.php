@@ -219,4 +219,14 @@ class Config extends \Yuges\Package\Config\Config
     {
         return self::get('job.handler.stage', $default);
     }
+
+    public static function getQueueName(mixed $default = null): string
+    {
+        return self::get('job.queue.name', $default);
+    }
+
+    public static function getQueueConnection(mixed $default = null): string
+    {
+        return self::get('job.queue.connection', $default);
+    }
 }

@@ -59,5 +59,9 @@ return [
             'stage' => Yuges\Processable\Handlers\StageEventHandler::class,
             'process' => Yuges\Processable\Handlers\StageEventHandler::class,
         ],
+        'queue' => [
+            'name' => env('PROCESS_QUEUE', ''),
+            'connection' => env('QUEUE_CONNECTION', 'sync'),
+        ],
     ],
 ];

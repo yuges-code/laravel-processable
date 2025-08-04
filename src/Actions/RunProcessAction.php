@@ -66,6 +66,8 @@ class RunProcessAction
                 'state' => ProcessState::Finished,
             ]);
         })
+        ->onConnection(Config::getQueueConnection())
+        ->onQueue(Config::getQueueName())
         ->dispatch();
 
         return $model;
