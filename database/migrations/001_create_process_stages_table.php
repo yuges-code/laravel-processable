@@ -41,6 +41,7 @@ return new class extends Migration
             $table->string('class');
             $table->unsignedTinyInteger('state')->default(ProcessState::Pending);
 
+            $table->timestamp('failed_at')->nullable();
             $table->timestamps();
         });
     }
