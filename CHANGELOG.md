@@ -2,6 +2,10 @@
 
 All notable changes to laravel-package-template will be documented in this file.
 
+## 1.0.9 - 2025-11-25
+
+**Full Changelog**: https://github.com/yuges-code/laravel-processable/compare/1.0.8...1.0.9
+
 ## 1.0.8 - 2025-11-18
 
 **Full Changelog**: https://github.com/yuges-code/laravel-processable/compare/1.0.7...1.0.8
