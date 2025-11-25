@@ -4,7 +4,7 @@ namespace Yuges\Processable\Handlers;
 
 use Yuges\Processable\Config\Config;
 use Illuminate\Queue\Events\JobFailed;
-use Yuges\Processable\Enums\ProcessState;
+use Yuges\Processable\Enums\StageState;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Yuges\Processable\Jobs\ProcessStageJob;
@@ -30,7 +30,7 @@ class ProcessEventHandler
             return;
         }
 
-        Config::getUpdateProcessStageAction($job->getStage())->execute(ProcessState::Started);
+        Config::getUpdateProcessStageAction($job->getStage())->execute(StageState::Started);
     }
 
     public function after(JobProcessed $event): void
@@ -47,7 +47,7 @@ class ProcessEventHandler
             return;
         }
 
-        Config::getUpdateProcessStageAction($job->getStage())->execute(ProcessState::Finished);
+        Config::getUpdateProcessStageAction($job->getStage())->execute(StageState::Finished);
     }
 
     public function failing(JobFailed $event): void
@@ -64,6 +64,6 @@ class ProcessEventHandler
             return;
         }
 
-        Config::getUpdateProcessStageAction($job->getStage())->execute(ProcessState::Failed);
+        Config::getUpdateProcessStageAction($job->getStage())->execute(StageState::Failed);
     }
 }

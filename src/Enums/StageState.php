@@ -2,7 +2,7 @@
 
 namespace Yuges\Processable\Enums;
 
-enum ProcessState: int implements \Yuges\Processable\Interfaces\ProcessState
+enum StageState: int implements \Yuges\Processable\Interfaces\StageState
 {
     case Pending = 10;
     case Started = 20;

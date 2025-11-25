@@ -8,10 +8,11 @@ use Yuges\Processable\Models\Stage;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
 use Illuminate\Queue\SerializesModels;
-use Yuges\Processable\Enums\ProcessState;
+use Yuges\Processable\Enums\StageState;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Yuges\Processable\Interfaces\Processable;
+use Yuges\Processable\Actions\UpdateProcessStageAction;
 use Yuges\Processable\Interfaces\Stage as StageInterface;
 
 class ProcessStageJob implements ShouldQueue
@@ -36,7 +37,12 @@ class ProcessStageJob implements ShouldQueue
             throw new Exception('Stage type error');
         }
 
-        $this->stage = Config::getUpdateProcessStageAction($this->stage)->execute(ProcessState::Processing);
+        $action = Config::getUpdateProcessStageAction(
+            $this->stage,
+            UpdateProcessStageAction::class
+        );
+
+        $this->stage = $action->execute(StageState::Processing, $this->job);
 
         $stage
             ->setStage($this->stage)
@@ -44,7 +50,7 @@ class ProcessStageJob implements ShouldQueue
             ->setProcessable($this->processable)
             ->execute();
 
-        Config::getUpdateProcessStageAction($this->stage)->execute(ProcessState::Processed);
+        $this->stage = $action->execute(StageState::Processed, $this->job);
     }
 
     public function getStage(): Stage

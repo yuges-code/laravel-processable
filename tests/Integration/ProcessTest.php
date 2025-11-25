@@ -2,6 +2,8 @@
 
 namespace Yuges\Processable\Tests\Integration;
 
+use Yuges\Processable\Models\Stage;
+use Yuges\Processable\Models\Process;
 use Yuges\Processable\Tests\TestCase;
 use Yuges\Processable\Tests\Stubs\Models\Post;
 use Yuges\Processable\Tests\Stubs\Processes\TestProcess;

@@ -24,7 +24,7 @@ class CreateProcessAction
     {
         $model = $this->processable->processes()->create([
             'class' => $process::class,
-            'state' => ProcessState::Pending,
+            'state' => Config::getProcessStateClass(ProcessState::class)::default(),
         ]);
 
         return Config::getCreateProcessStagesAction($this->processable)->execute($model);

@@ -4,8 +4,10 @@ namespace Yuges\Processable\Models;
 
 use Yuges\Package\Models\Model;
 use Yuges\Processable\Config\Config;
-use Yuges\Processable\Traits\HasState;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Yuges\Processable\Traits\HasJob;
+use Yuges\Processable\Traits\HasError;
+use Yuges\Processable\Traits\HasFailedJob;
+use Yuges\Processable\Traits\HasStageState;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Yuges\Processable\Interfaces\Stage as StageInterface;
 
@@ -14,7 +16,12 @@ use Yuges\Processable\Interfaces\Stage as StageInterface;
  */
 class Stage extends Model
 {
-    use HasFactory, HasState;
+    use
+        HasJob,
+        HasError,
+        HasFactory,
+        HasFailedJob,
+        HasStageState;
 
     protected $table = 'process_stages';
 
@@ -23,10 +30,5 @@ class Stage extends Model
     public function getTable(): string
     {
         return Config::getStageTable() ?? $this->table;
-    }
-
-    public function job(): BelongsTo
-    {
-        return $this->belongsTo(Config::getJobClass(Job::class));
     }
 }

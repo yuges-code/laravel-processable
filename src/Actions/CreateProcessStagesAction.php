@@ -4,8 +4,9 @@ namespace Yuges\Processable\Actions;
 
 use Exception;
 use Illuminate\Support\Collection;
+use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
-use Yuges\Processable\Enums\ProcessState;
+use Yuges\Processable\Enums\StageState;
 use Yuges\Processable\Interfaces\Processable;
 use Yuges\Processable\Interfaces\Process as ProcessInterface;
 
@@ -37,7 +38,7 @@ class CreateProcessStagesAction
 
                 return [
                     'class' => $stage::class,
-                    'state' => ProcessState::Pending,
+                    'state' => Config::getStageStateClass(StageState::class)::default(),
                 ];
             })
         );

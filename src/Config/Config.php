@@ -8,21 +8,34 @@ use Illuminate\Support\Collection;
 use Yuges\Processable\Models\Stage;
 use Yuges\Processable\Models\Batch;
 use Yuges\Processable\Models\Process;
+use Yuges\Processable\Enums\StageState;
+use Yuges\Processable\Models\FailedJob;
+use Yuges\Processable\Enums\ProcessState;
 use Yuges\Processable\Jobs\ProcessStageJob;
 use Yuges\Processable\Interfaces\Processable;
 use Yuges\Processable\Observers\StageObserver;
 use Yuges\Processable\Actions\RunProcessAction;
 use Yuges\Processable\Observers\ProcessObserver;
 use Yuges\Processable\Handlers\StageEventHandler;
+use Yuges\Processable\Actions\UpdateProcessAction;
 use Yuges\Processable\Actions\CreateProcessAction;
 use Yuges\Processable\Observers\ProcessableObserver;
-use Yuges\Processable\Actions\UpdateProcessStateAction;
+use Yuges\Processable\Actions\UpdateProcessStageAction;
 use Yuges\Processable\Actions\CreateProcessStagesAction;
-use Yuges\Processable\Actions\UpdateProcessStageStateAction;
 
 class Config extends \Yuges\Package\Config\Config
 {
     const string NAME = 'processable';
+
+    public static function getJobKeyHas(mixed $default = null): bool
+    {
+        return self::get('models.job.key.has', $default);
+    }
+
+    public static function getJobKeyType(mixed $default = null): KeyType
+    {
+        return self::get('models.job.key.type', $default);
+    }
 
     public static function getJobTable(mixed $default = null): string
     {
@@ -35,16 +48,30 @@ class Config extends \Yuges\Package\Config\Config
         return self::get('models.job.class', $default);
     }
 
+    public static function getJobRelationName(mixed $default = null): string
+    {
+        return self::get('models.job.relation.name', $default);
+    }
+
+    /** @return class-string<JobObserver> */
+    public static function getJobObserverClass(mixed $default = null): string
+    {
+        return self::get('models.job.observer', $default);
+    }
+
+    public static function getBatchKeyHas(mixed $default = null): bool
+    {
+        return self::get('models.batch.key.has', $default);
+    }
+
+    public static function getBatchKeyType(mixed $default = null): KeyType
+    {
+        return self::get('models.batch.key.type', $default);
+    }
+
     public static function getBatchTable(mixed $default = null): string
     {
         return self::get('models.batch.table', $default);
-    }
-
-    public static function getBatch(mixed $default = null): Batch
-    {
-        $batch = self::getBatchClass($default);
-
-        return new $batch;
     }
 
     /** @return class-string<Batch> */
@@ -53,26 +80,25 @@ class Config extends \Yuges\Package\Config\Config
         return self::get('models.batch.class', $default);
     }
 
-    public static function getProcessTable(mixed $default = null): string
+    public static function getBatchRelationName(mixed $default = null): string
     {
-        return self::get('models.process.table', $default);
+        return self::get('models.batch.relation.name', $default);
     }
 
-    /** @return class-string<Process> */
-    public static function getProcessClass(mixed $default = null): string
+    /** @return class-string<BatchObserver> */
+    public static function getBatchObserverClass(mixed $default = null): string
     {
-        return self::get('models.process.class', $default);
+        return self::get('models.batch.observer', $default);
     }
 
-    public static function getProcessKeyType(mixed $default = null): KeyType
+    public static function getStageKeyHas(mixed $default = null): bool
     {
-        return self::get('models.process.key', $default);
+        return self::get('models.stage.key.has', $default);
     }
 
-    /** @return class-string<ProcessObserver> */
-    public static function getProcessObserverClass(mixed $default = null): string
+    public static function getStageKeyType(mixed $default = null): KeyType
     {
-        return self::get('models.process.observer', $default);
+        return self::get('models.stage.key.type', $default);
     }
 
     public static function getStageTable(mixed $default = null): string
@@ -86,9 +112,9 @@ class Config extends \Yuges\Package\Config\Config
         return self::get('models.stage.class', $default);
     }
 
-    public static function getStageKeyType(mixed $default = null): KeyType
+    public static function getStageRelationName(mixed $default = null): string
     {
-        return self::get('models.stage.key', $default);
+        return self::get('models.stage.relation.name', $default);
     }
 
     /** @return class-string<StageObserver> */
@@ -97,14 +123,78 @@ class Config extends \Yuges\Package\Config\Config
         return self::get('models.stage.observer', $default);
     }
 
-    public static function getProcessableKeyType(mixed $default = null): KeyType
+    public static function getFailedJobKeyHas(mixed $default = null): bool
     {
-        return self::get('models.processable.key', $default);
+        return self::get('models.failed.key.has', $default);
     }
 
-    public static function getProcessableRelationName(mixed $default = null): string
+    public static function getFailedJobKeyType(mixed $default = null): KeyType
     {
-        return self::get('models.processable.relation.name', $default);
+        return self::get('models.failed.key.type', $default);
+    }
+
+    public static function getFailedJobTable(mixed $default = null): string
+    {
+        return self::get('models.failed.table', $default);
+    }
+
+    /** @return class-string<FailedJob> */
+    public static function getFailedJobClass(mixed $default = null): string
+    {
+        return self::get('models.failed.class', $default);
+    }
+
+    public static function getFailedJobRelationName(mixed $default = null): string
+    {
+        return self::get('models.failed.relation.name', $default);
+    }
+
+    /** @return class-string<FailedJobObserver> */
+    public static function getFailedJobObserverClass(mixed $default = null): string
+    {
+        return self::get('models.failed.observer', $default);
+    }
+
+    public static function getProcessKeyHas(mixed $default = null): bool
+    {
+        return self::get('models.process.key.has', $default);
+    }
+
+    public static function getProcessKeyType(mixed $default = null): KeyType
+    {
+        return self::get('models.process.key.type', $default);
+    }
+
+    public static function getProcessTable(mixed $default = null): string
+    {
+        return self::get('models.process.table', $default);
+    }
+
+    /** @return class-string<Process> */
+    public static function getProcessClass(mixed $default = null): string
+    {
+        return self::get('models.process.class', $default);
+    }
+
+    public static function getProcessRelationName(mixed $default = null): string
+    {
+        return self::get('models.process.relation.name', $default);
+    }
+
+    /** @return class-string<ProcessObserver> */
+    public static function getProcessObserverClass(mixed $default = null): string
+    {
+        return self::get('models.process.observer', $default);
+    }
+
+    public static function getProcessableKeyHas(mixed $default = null): bool
+    {
+        return self::get('models.processable.key.has', $default);
+    }
+
+    public static function getProcessableKeyType(mixed $default = null): KeyType
+    {
+        return self::get('models.processable.key.type', $default);
     }
 
     /** @return Collection<array-key, class-string<Processable>> */
@@ -115,10 +205,27 @@ class Config extends \Yuges\Package\Config\Config
         );
     }
 
+    public static function getProcessableRelationName(mixed $default = null): string
+    {
+        return self::get('models.processable.relation.name', $default);
+    }
+
     /** @return class-string<ProcessableObserver> */
     public static function getProcessableObserverClass(mixed $default = null): string
     {
         return self::get('models.processable.observer', $default);
+    }
+
+    /** @return class-string<StageState> */
+    public static function getStageStateClass(mixed $default = null): string
+    {
+        return self::get('stage.state', $default);
+    }
+
+    /** @return class-string<ProcessState> */
+    public static function getProcessStateClass(mixed $default = null): string
+    {
+        return self::get('process.state', $default);
     }
 
     public static function getRunProcessAction(
@@ -150,14 +257,14 @@ class Config extends \Yuges\Package\Config\Config
     }
 
     public static function getUpdateProcessAction(
-        Processable $processable,
+        Process $process,
         mixed $default = null
-    ): UpdateProcessStateAction
+    ): UpdateProcessAction
     {
-        return self::getUpdateProcessActionClass($default)::create($processable);
+        return self::getUpdateProcessActionClass($default)::create($process);
     }
 
-    /** @return class-string<UpdateProcessStateAction> */
+    /** @return class-string<UpdateProcessAction> */
     public static function getUpdateProcessActionClass(mixed $default = null): string
     {
         return self::get('actions.process.update', $default);
@@ -180,12 +287,12 @@ class Config extends \Yuges\Package\Config\Config
     public static function getUpdateProcessStageAction (
         Stage $stage,
         mixed $default = null
-    ): UpdateProcessStageStateAction
+    ): UpdateProcessStageAction
     {
         return self::getUpdateProcessStageActionClass($default)::create($stage);
     }
 
-    /** @return class-string<UpdateProcessStageStateAction> */
+    /** @return class-string<UpdateProcessStageAction> */
     public static function getUpdateProcessStageActionClass(mixed $default = null): string
     {
         return self::get('actions.stage.update', $default);

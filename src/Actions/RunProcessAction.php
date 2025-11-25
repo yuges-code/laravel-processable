@@ -4,9 +4,9 @@ namespace Yuges\Processable\Actions;
 
 use Exception;
 use Throwable;
+use Carbon\Carbon;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Collection;
-use Yuges\Processable\Models\Stage;
 use Illuminate\Support\Facades\Bus;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
@@ -38,11 +38,7 @@ class RunProcessAction
                 throw new Exception('Error stage type');
             }
 
-            $stage = $model->stages->firstWhere('class', '=', $stage::class);
-
-            if (! $stage instanceof Stage) {
-                throw new Exception('Error stage type');
-            }
+            $stage = $model->stages->firstOrFail('class', '=', $stage::class);
 
             return Config::getProcessStageJob(
                 $stage,
@@ -52,19 +48,20 @@ class RunProcessAction
             );
         });
 
-        Bus::batch([$jobs->toArray()])->before(function (Batch $batch) use ($model) {
-            $model->update([
-                'batch_id' => $batch->id,
-                'state' => ProcessState::Started,
-            ]);
-        })->progress(function (Batch $batch) use ($model) {
+        $action = Config::getUpdateProcessAction($model, UpdateProcessAction::class);
 
-        })->catch(function (Batch $batch, Throwable $e) {
-
-        })->finally(function (Batch $batch) use ($model) {
-            $model->update([
-                'state' => ProcessState::Finished,
-            ]);
+        Bus::batch([$jobs->toArray()])
+        ->before(function (Batch $batch) use ($action) {
+            $action->execute(ProcessState::Started, $batch);
+        })
+        ->progress(function (Batch $batch) use ($action) {
+            $action->execute(ProcessState::Processing, $batch);
+        })
+        ->catch(function (Batch $batch, Throwable $e) use ($action) {
+            $action->execute(ProcessState::Failed, $batch, $e);
+        })
+        ->finally(function (Batch $batch) use ($action) {
+            $action->execute(ProcessState::Finished, $batch);
         })
         ->onConnection(Config::getQueueConnection())
         ->onQueue(Config::getQueueName())

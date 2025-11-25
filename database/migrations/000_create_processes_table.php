@@ -23,28 +23,36 @@ return new class extends Migration
         }
 
         Schema::create($this->table, function (Blueprint $table) {
-            $table->key(Config::getProcessKeyType(KeyType::BigInteger));
+            if (Config::getProcessKeyHas(true)) {
+                $table->key(Config::getProcessKeyType(KeyType::BigInteger));
+            }
 
             $table->string('class');
             $table->longText('payload')->nullable();
-            $table->unsignedTinyInteger('state')->default(ProcessState::Pending);
-
-            $table->keyMorphs(
-                Config::getProcessableKeyType(KeyType::BigInteger),
-                Config::getProcessableRelationName('processable')
-            );
-
-            $table->string(Config::getBatch(Batch::class)->getForeignKey())->nullable();
             $table
-                ->foreign(Config::getBatch(Batch::class)->getForeignKey())
-                ->references('id')
-                ->on(Config::getBatchClass(Batch::class)::getTableName())
-                ->cascadeOnUpdate()
-                ->nullOnDelete();
+                ->unsignedTinyInteger('state')
+                ->default(Config::getProcessStateClass(ProcessState::class)::default());
 
-            $table->timestamp('reserved_at')->nullable();
-            $table->timestamp('available_at')->nullable();
-            $table->timestamp('cancelled_at')->nullable();
+            if (Config::getProcessableKeyHas(true)) {
+                $table->keyMorphs(
+                    Config::getProcessableKeyType(KeyType::BigInteger),
+                    Config::getProcessableRelationName('processable')
+                );
+            }
+
+            if (Config::getBatchKeyHas(true)) {
+                $batch = new (Config::getBatchClass(Batch::class));
+
+                $table->string($batch->getForeignKey())->nullable();
+                $table
+                    ->foreign($batch->getForeignKey())
+                    ->references('id')
+                    ->on(Config::getBatchClass(Batch::class)::getTableName())
+                    ->cascadeOnUpdate()
+                    ->nullOnDelete();
+            }
+
+            $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->timestamp('failed_at')->nullable();
             $table->timestamps();
