@@ -18,8 +18,7 @@ class StageEventHandler
 
     public function before(JobProcessing $event): void
     {
-        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class))
-        {
+        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class)) {
             return;
         }
 
@@ -35,8 +34,7 @@ class StageEventHandler
 
     public function after(JobProcessed $event): void
     {
-        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class))
-        {
+        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class)) {
             return;
         }
 
@@ -52,8 +50,7 @@ class StageEventHandler
 
     public function failing(JobFailed $event): void
     {
-        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class))
-        {
+        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class)) {
             return;
         }
 
@@ -64,6 +61,10 @@ class StageEventHandler
             return;
         }
 
-        Config::getUpdateProcessStageAction($job->getStage())->execute(StageState::Failed, $event->job);
+        Config::getUpdateProcessStageAction($job->getStage())->execute(
+            StageState::Failed,
+            $event->job,
+            $event->exception
+        );
     }
 }

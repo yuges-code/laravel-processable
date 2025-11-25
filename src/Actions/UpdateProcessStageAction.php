@@ -2,10 +2,12 @@
 
 namespace Yuges\Processable\Actions;
 
+use Throwable;
 use Carbon\Carbon;
 use Yuges\Processable\Models\Stage;
 use Illuminate\Contracts\Queue\Job;
 use Yuges\Processable\Enums\StageState;
+use Yuges\Processable\Error\StageError;
 use Yuges\Processable\Interfaces\StageState as StageStateInterface;
 
 class UpdateProcessStageAction
@@ -20,13 +22,22 @@ class UpdateProcessStageAction
         return new static($stage);
     }
 
-    public function execute(StageStateInterface $state, ?Job $job = null): Stage
+    public function execute(StageStateInterface $state, ?Job $job = null, ?Throwable $e = null): Stage
     {
         $attributes = [
             'state' => $state,
             'job_id' => $job?->getJobId() ?? $this->stage->job_id,
             'job_uuid' => $job?->uuid() ?? $this->stage->job_uuid,
         ];
+
+        if ($e) {
+            $attributes['error'] = new StageError(
+                $e->getMessage(),
+                $e->getCode(),
+                $e->getFile(),
+                $e->getLine(),
+            );
+        }
 
         match ($state->value) {
             StageState::Started->value => $attributes['started_at'] = Carbon::now(),
