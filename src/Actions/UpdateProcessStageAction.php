@@ -26,9 +26,12 @@ class UpdateProcessStageAction
     {
         $attributes = [
             'state' => $state,
-            'job_id' => $job?->getJobId() ?? $this->stage->job_id,
             'job_uuid' => $job?->uuid() ?? $this->stage->job_uuid,
         ];
+
+        if ($state->value != StageState::Failed->value) {
+            $attributes['job_id'] = $job?->getJobId() ?? $this->stage->job_id;
+        }
 
         if ($e) {
             $attributes['error'] = new StageError(
