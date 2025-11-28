@@ -52,16 +52,16 @@ class RunProcessAction
 
         Bus::batch([$jobs->toArray()])
         ->before(function (Batch $batch) use ($action) {
-            $action->execute(ProcessState::Started, $batch);
+            $action->execute(Config::getProcessStateClass(ProcessState::class)::Started, $batch);
         })
         ->progress(function (Batch $batch) use ($action) {
-            $action->execute(ProcessState::Processing, $batch);
+            $action->execute(Config::getProcessStateClass(ProcessState::class)::Processing, $batch);
         })
         ->catch(function (Batch $batch, Throwable $e) use ($action) {
-            $action->execute(ProcessState::Failed, $batch, $e);
+            $action->execute(Config::getProcessStateClass(ProcessState::class)::Failed, $batch, $e);
         })
         ->finally(function (Batch $batch) use ($action) {
-            $action->execute(ProcessState::Finished, $batch);
+            $action->execute(Config::getProcessStateClass(ProcessState::class)::Finished, $batch);
         })
         ->onConnection(Config::getQueueConnection())
         ->onQueue(Config::getQueueName())

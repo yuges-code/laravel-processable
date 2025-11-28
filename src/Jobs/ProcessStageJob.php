@@ -42,7 +42,7 @@ class ProcessStageJob implements ShouldQueue
             UpdateProcessStageAction::class
         );
 
-        $this->stage = $action->execute(StageState::Processing, $this->job);
+        $this->stage = $action->execute(Config::getStageStateClass(StageState::class)::Processing, $this->job);
 
         $stage
             ->setStage($this->stage)
@@ -50,7 +50,7 @@ class ProcessStageJob implements ShouldQueue
             ->setProcessable($this->processable)
             ->execute();
 
-        $this->stage = $action->execute(StageState::Processed, $this->job);
+        $this->stage = $action->execute(Config::getStageStateClass(StageState::class)::Processed, $this->job);
     }
 
     public function getStage(): Stage

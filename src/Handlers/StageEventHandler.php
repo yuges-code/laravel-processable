@@ -29,7 +29,8 @@ class StageEventHandler
             return;
         }
 
-        Config::getUpdateProcessStageAction($job->getStage())->execute(StageState::Started, $event->job);
+        Config::getUpdateProcessStageAction($job->getStage())
+            ->execute(Config::getStageStateClass(StageState::class)::Started, $event->job);
     }
 
     public function after(JobProcessed $event): void
@@ -45,7 +46,8 @@ class StageEventHandler
             return;
         }
 
-        Config::getUpdateProcessStageAction($job->getStage())->execute(StageState::Finished, $event->job);
+        Config::getUpdateProcessStageAction($job->getStage())
+            ->execute(Config::getStageStateClass(StageState::class)::Finished, $event->job);
     }
 
     public function failing(JobFailed $event): void
@@ -62,7 +64,7 @@ class StageEventHandler
         }
 
         Config::getUpdateProcessStageAction($job->getStage())->execute(
-            StageState::Failed,
+            Config::getStageStateClass(StageState::class)::Failed,
             $event->job,
             $event->exception
         );
