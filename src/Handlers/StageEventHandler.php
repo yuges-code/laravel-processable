@@ -16,53 +16,20 @@ class StageEventHandler
         return new static();
     }
 
-    public function before(JobProcessing $event): void
+    public function before(JobProcessing $event, ProcessStageJob $job): void
     {
-        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class)) {
-            return;
-        }
-
-        $payload = $event->job->payload();
-        $job = unserialize($payload['data']['command']);
-
-        if (! $job instanceof ProcessStageJob) {
-            return;
-        }
-
         Config::getUpdateProcessStageAction($job->getStage())
             ->execute(Config::getStageStateClass(StageState::class)::Started, $event->job);
     }
 
-    public function after(JobProcessed $event): void
+    public function after(JobProcessed $event, ProcessStageJob $job): void
     {
-        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class)) {
-            return;
-        }
-
-        $payload = $event->job->payload();
-        $job = unserialize($payload['data']['command']);
-
-        if (! $job instanceof ProcessStageJob) {
-            return;
-        }
-
         Config::getUpdateProcessStageAction($job->getStage())
             ->execute(Config::getStageStateClass(StageState::class)::Finished, $event->job);
     }
 
-    public function failing(JobFailed $event): void
+    public function failing(JobFailed $event, ProcessStageJob $job): void
     {
-        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class)) {
-            return;
-        }
-
-        $payload = $event->job->payload();
-        $job = unserialize($payload['data']['command']);
-
-        if (! $job instanceof ProcessStageJob) {
-            return;
-        }
-
         Config::getUpdateProcessStageAction($job->getStage())->execute(
             Config::getStageStateClass(StageState::class)::Failed,
             $event->job,

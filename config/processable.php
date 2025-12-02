@@ -92,6 +92,9 @@ return [
     ],
 
     'actions' => [
+        'job' => [
+            'create' => Yuges\Processable\Actions\CreateJobAction::class,
+        ],
         'stage' => [
             'update' => Yuges\Processable\Actions\UpdateProcessStageAction::class,
             'create' => Yuges\Processable\Actions\CreateProcessStagesAction::class,
@@ -106,6 +109,7 @@ return [
     'job' => [
         'class' => Yuges\Processable\Jobs\ProcessStageJob::class,
         'handler' => [
+            'event' => Yuges\Processable\Handlers\EventHandler::class,
             'stage' => Yuges\Processable\Handlers\StageEventHandler::class,
             'process' => Yuges\Processable\Handlers\ProcessEventHandler::class,
         ],

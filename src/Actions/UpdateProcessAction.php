@@ -2,9 +2,8 @@
 
 namespace Yuges\Processable\Actions;
 
-use Throwable;
 use Carbon\Carbon;
-use Illuminate\Bus\Batch;
+use Illuminate\Contracts\Queue\Job;
 use Yuges\Processable\Models\Process;
 use Yuges\Processable\Enums\ProcessState;
 use Yuges\Processable\Interfaces\ProcessState as ProcessStateInterface;
@@ -21,11 +20,10 @@ class UpdateProcessAction
         return new static($process);
     }
 
-    public function execute(ProcessStateInterface $state, ?Batch $batch = null, ?Throwable $e = null): Process
+    public function execute(ProcessStateInterface $state, ?Job $job = null): Process
     {
         $attributes = [
             'state' => $state,
-            'batch_id' => $batch->id ?? $this->process->batch_id,
         ];
 
         match ($state->value) {

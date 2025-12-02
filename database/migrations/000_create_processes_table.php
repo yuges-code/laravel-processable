@@ -1,7 +1,6 @@
 <?php
 
 use Yuges\Package\Enums\KeyType;
-use Yuges\Processable\Models\Batch;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
 use Yuges\Processable\Enums\ProcessState;
@@ -38,18 +37,6 @@ return new class extends Migration
                     Config::getProcessableKeyType(KeyType::BigInteger),
                     Config::getProcessableRelationName('processable')
                 );
-            }
-
-            if (Config::getBatchKeyHas(true)) {
-                $batch = new (Config::getBatchClass(Batch::class));
-
-                $table->string($batch->getForeignKey())->nullable();
-                $table
-                    ->foreign($batch->getForeignKey())
-                    ->references('id')
-                    ->on(Config::getBatchClass(Batch::class)::getTableName())
-                    ->cascadeOnUpdate()
-                    ->nullOnDelete();
             }
 
             $table->timestamp('started_at')->nullable();

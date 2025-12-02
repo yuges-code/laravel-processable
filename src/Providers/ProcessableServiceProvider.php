@@ -7,11 +7,11 @@ use Yuges\Processable\Models\Stage;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
 use Illuminate\Support\Facades\Queue;
+use Yuges\Processable\Handlers\EventHandler;
 use Yuges\Processable\Observers\StageObserver;
 use Yuges\Processable\Exceptions\InvalidStage;
 use Yuges\Processable\Observers\ProcessObserver;
 use Yuges\Processable\Exceptions\InvalidProcess;
-use Yuges\Processable\Handlers\StageEventHandler;
 use Yuges\Package\Providers\PackageServiceProvider;
 
 class ProcessableServiceProvider extends PackageServiceProvider
@@ -44,7 +44,7 @@ class ProcessableServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        $handler = Config::getStageEventHandler(StageEventHandler::class);
+        $handler = Config::getEventHandler(EventHandler::class);
 
         Queue::before($handler->before(...));
         Queue::after($handler->after(...));

@@ -2,6 +2,7 @@
 
 namespace Yuges\Processable\Abstracts;
 
+use Illuminate\Support\Collection;
 use Yuges\Processable\Models\Process as ProcessModel;
 
 abstract class Process implements \Yuges\Processable\Interfaces\Process
@@ -13,9 +14,41 @@ abstract class Process implements \Yuges\Processable\Interfaces\Process
         return [];
     }
 
+    public function stageCollection(): Collection
+    {
+        return Collection::make($this->stages());
+    }
+
+    public function firstStage(): ?string
+    {
+        return $this->stageCollection()->first();
+    }
+
+    public function lastStage(): ?string
+    {
+        return $this->stageCollection()->last();
+    }
+
+    public function nextStage(?string $stage = null): ?string
+    {
+        $stages = $this->stageCollection();
+
+        if (! $stage) {
+            return $stages->first();
+        }
+
+        $key = $stages->search($stage);
+
+        if ($key === false) {
+            return null;
+        }
+
+        return $stages->get($key + 1);
+    }
+
     static function process(): ProcessModel
     {
-        return self::createProcess();
+        return static::createProcess();
     }
 
     public static function createProcess(): ProcessModel
@@ -28,7 +61,7 @@ abstract class Process implements \Yuges\Processable\Interfaces\Process
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         $this->name = $name;
 

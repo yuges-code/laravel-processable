@@ -3,46 +3,51 @@
 namespace Yuges\Processable\Jobs;
 
 use Exception;
-use Illuminate\Bus\Batchable;
 use Yuges\Processable\Models\Stage;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
-use Illuminate\Queue\SerializesModels;
 use Yuges\Processable\Enums\StageState;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Yuges\Processable\Interfaces\Processable;
+use Yuges\Processable\Actions\UpdateProcessAction;
 use Yuges\Processable\Actions\UpdateProcessStageAction;
+use Yuges\Processable\Enums\ProcessState;
 use Yuges\Processable\Interfaces\Stage as StageInterface;
 
 class ProcessStageJob implements ShouldQueue
 {
-    use Batchable, Queueable, SerializesModels;
+    use Queueable;
+
+    /**
+     * @var array{stage: UpdateProcessStageAction, process: UpdateProcessAction}
+     */
+    private array $actions = [
+        'stage' => null,
+        'process' => null,
+    ];
 
     public function __construct(
         protected Stage $stage,
         protected Process $process,
         protected Processable $processable,
-    ) {}
+    ) {
+        $this->actions['stage'] = Config::getUpdateProcessStageAction($this->stage, UpdateProcessStageAction::class);
+        $this->actions['process'] = Config::getUpdateProcessAction($this->process, UpdateProcessAction::class);
+    }
 
     public function handle(): void
     {
-        if ($this->batch()->cancelled()) {
-            return;
-        }
-
         $stage = new $this->stage->class;
 
         if (! $stage instanceof StageInterface) {
             throw new Exception('Stage type error');
         }
 
-        $action = Config::getUpdateProcessStageAction(
-            $this->stage,
-            UpdateProcessStageAction::class
-        );
+        $this->stage = $this->actions['stage']
+            ->execute(Config::getStageStateClass(StageState::class)::Processing, $this->job);
 
-        $this->stage = $action->execute(Config::getStageStateClass(StageState::class)::Processing, $this->job);
+        $this->actions['process']->execute(Config::getProcessStateClass(ProcessState::class)::Processing, $this->job);
 
         $stage
             ->setStage($this->stage)
@@ -50,11 +55,29 @@ class ProcessStageJob implements ShouldQueue
             ->setProcessable($this->processable)
             ->execute();
 
-        $this->stage = $action->execute(Config::getStageStateClass(StageState::class)::Processed, $this->job);
+        $this->stage = $this->actions['stage']
+            ->execute(Config::getStageStateClass(StageState::class)::Processed, $this->job);
+
+        $process = new ($this->process->class);
+
+        if ($this->stage->class === $process->lastStage()) {
+            $this->actions['process']
+                ->execute(Config::getProcessStateClass(ProcessState::class)::Processed, $this->job);
+        }
     }
 
     public function getStage(): Stage
     {
         return $this->stage;
+    }
+
+    public function getProcess(): Process
+    {
+        return $this->process;
+    }
+
+    public function getProcessable(): Processable
+    {
+        return $this->processable;
     }
 }

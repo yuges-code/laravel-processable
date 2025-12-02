@@ -12,13 +12,16 @@ use Yuges\Processable\Enums\StageState;
 use Yuges\Processable\Models\FailedJob;
 use Yuges\Processable\Enums\ProcessState;
 use Yuges\Processable\Jobs\ProcessStageJob;
+use Yuges\Processable\Handlers\EventHandler;
 use Yuges\Processable\Interfaces\Processable;
+use Yuges\Processable\Actions\CreateJobAction;
 use Yuges\Processable\Observers\StageObserver;
 use Yuges\Processable\Actions\RunProcessAction;
 use Yuges\Processable\Observers\ProcessObserver;
 use Yuges\Processable\Handlers\StageEventHandler;
 use Yuges\Processable\Actions\UpdateProcessAction;
 use Yuges\Processable\Actions\CreateProcessAction;
+use Yuges\Processable\Handlers\ProcessEventHandler;
 use Yuges\Processable\Observers\ProcessableObserver;
 use Yuges\Processable\Actions\UpdateProcessStageAction;
 use Yuges\Processable\Actions\CreateProcessStagesAction;
@@ -228,6 +231,21 @@ class Config extends \Yuges\Package\Config\Config
         return self::get('process.state', $default);
     }
 
+    public static function getCreateJobAction(
+        Process $process,
+        Processable $processable,
+        mixed $default = null
+    ): CreateJobAction
+    {
+        return self::getCreateJobActionClass($default)::create($process, $processable);
+    }
+
+    /** @return class-string<CreateJobAction> */
+    public static function getCreateJobActionClass(mixed $default = null): string
+    {
+        return self::get('actions.job.create', $default);
+    }
+
     public static function getRunProcessAction(
         Processable $processable,
         mixed $default = null
@@ -316,6 +334,17 @@ class Config extends \Yuges\Package\Config\Config
         return self::get('job.class', $default);
     }
 
+    public static function getEventHandler(mixed $default = null): EventHandler
+    {
+        return self::getEventHandlerClass($default)::create();
+    }
+
+    /** @return class-string<EventHandler> */
+    public static function getEventHandlerClass(mixed $default = null): string
+    {
+        return self::get('job.handler.event', $default);
+    }
+
     public static function getStageEventHandler(mixed $default = null): StageEventHandler
     {
         return self::getStageEventHandlerClass($default)::create();
@@ -325,6 +354,17 @@ class Config extends \Yuges\Package\Config\Config
     public static function getStageEventHandlerClass(mixed $default = null): string
     {
         return self::get('job.handler.stage', $default);
+    }
+
+    public static function getProcessEventHandler(mixed $default = null): ProcessEventHandler
+    {
+        return self::getProcessEventHandlerClass($default)::create();
+    }
+
+    /** @return class-string<ProcessEventHandler> */
+    public static function getProcessEventHandlerClass(mixed $default = null): string
+    {
+        return self::get('job.handler.process', $default);
     }
 
     public static function getQueueName(mixed $default = null): string

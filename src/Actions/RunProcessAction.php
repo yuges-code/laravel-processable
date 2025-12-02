@@ -2,18 +2,9 @@
 
 namespace Yuges\Processable\Actions;
 
-use Exception;
-use Throwable;
-use Carbon\Carbon;
-use Illuminate\Bus\Batch;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Bus;
 use Yuges\Processable\Config\Config;
 use Yuges\Processable\Models\Process;
-use Yuges\Processable\Enums\ProcessState;
-use Yuges\Processable\Jobs\ProcessStageJob;
 use Yuges\Processable\Interfaces\Processable;
-use Yuges\Processable\Interfaces\Stage as InterfacesStage;
 
 class RunProcessAction
 {
@@ -27,46 +18,16 @@ class RunProcessAction
         return new static($processable);
     }
 
-    public function execute(Process $model): Process
+    public function execute(Process $process): Process
     {
-        $process = new $model->class;
+        $stage = (new $process->class)->firstStage();
 
-        $jobs = Collection::make($process->stages())->map(function (string $stage) use ($model) {
-            $stage = new $stage;
+        $job = Config::getCreateJobAction($process, $this->processable)->execute($stage);
 
-            if (! $stage instanceof InterfacesStage) {
-                throw new Exception('Error stage type');
-            }
+        dispatch($job)
+            ->onConnection(Config::getQueueConnection())
+            ->onQueue(Config::getQueueName());
 
-            $stage = $model->stages->firstOrFail('class', '=', $stage::class);
-
-            return Config::getProcessStageJob(
-                $stage,
-                $model,
-                $this->processable,
-                ProcessStageJob::class
-            );
-        });
-
-        $action = Config::getUpdateProcessAction($model, UpdateProcessAction::class);
-
-        Bus::batch([$jobs->toArray()])
-        ->before(function (Batch $batch) use ($action) {
-            $action->execute(Config::getProcessStateClass(ProcessState::class)::Started, $batch);
-        })
-        ->progress(function (Batch $batch) use ($action) {
-            $action->execute(Config::getProcessStateClass(ProcessState::class)::Processing, $batch);
-        })
-        ->catch(function (Batch $batch, Throwable $e) use ($action) {
-            $action->execute(Config::getProcessStateClass(ProcessState::class)::Failed, $batch, $e);
-        })
-        ->finally(function (Batch $batch) use ($action) {
-            $action->execute(Config::getProcessStateClass(ProcessState::class)::Finished, $batch);
-        })
-        ->onConnection(Config::getQueueConnection())
-        ->onQueue(Config::getQueueName())
-        ->dispatch();
-
-        return $model;
+        return $process;
     }
 }

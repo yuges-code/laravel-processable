@@ -4,10 +4,10 @@ namespace Yuges\Processable\Handlers;
 
 use Yuges\Processable\Config\Config;
 use Illuminate\Queue\Events\JobFailed;
-use Yuges\Processable\Enums\StageState;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Yuges\Processable\Jobs\ProcessStageJob;
+use Yuges\Processable\Interfaces\ProcessState;
 
 class ProcessEventHandler
 {
@@ -16,57 +16,21 @@ class ProcessEventHandler
         return new static();
     }
 
-    public function before(JobProcessing $event): void
+    public function before(JobProcessing $event, ProcessStageJob $job): void
     {
-        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class))
-        {
-            return;
-        }
-
-        $payload = $event->job->payload();
-        $job = unserialize($payload['data']['command']);
-
-        if (! $job instanceof ProcessStageJob) {
-            return;
-        }
-
-        Config::getUpdateProcessStageAction($job->getStage())
-            ->execute(Config::getStageStateClass(StageState::class)::Started);
+        Config::getUpdateProcessAction($job->getProcess())
+            ->execute(Config::getProcessStateClass(ProcessState::class)::Started);
     }
 
-    public function after(JobProcessed $event): void
+    public function after(JobProcessed $event, ProcessStageJob $job): void
     {
-        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class))
-        {
-            return;
-        }
-
-        $payload = $event->job->payload();
-        $job = unserialize($payload['data']['command']);
-
-        if (! $job instanceof ProcessStageJob) {
-            return;
-        }
-
-        Config::getUpdateProcessStageAction($job->getStage())
-            ->execute(Config::getStageStateClass(StageState::class)::Finished);
+        Config::getUpdateProcessAction($job->getProcess())
+            ->execute(Config::getProcessStateClass(ProcessState::class)::Finished);
     }
 
-    public function failing(JobFailed $event): void
+    public function failing(JobFailed $event, ProcessStageJob $job): void
     {
-        if ($event->job->resolveName() != Config::getProcessStageJobClass(ProcessStageJob::class))
-        {
-            return;
-        }
-
-        $payload = $event->job->payload();
-        $job = unserialize($payload['data']['command']);
-
-        if (! $job instanceof ProcessStageJob) {
-            return;
-        }
-
-        Config::getUpdateProcessStageAction($job->getStage())
-            ->execute(Config::getStageStateClass(StageState::class)::Failed);
+        Config::getUpdateProcessAction($job->getProcess())
+            ->execute(Config::getProcessStateClass(ProcessState::class)::Failed);
     }
 }
