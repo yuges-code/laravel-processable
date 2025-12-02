@@ -29,7 +29,10 @@ class UpdateProcessStageAction
             'job_uuid' => $job?->uuid() ?? $this->stage->job_uuid,
         ];
 
-        if ($state->value != StageState::Failed->value) {
+        if (
+            $state->value != StageState::Failed->value &&
+            $state->value != StageState::Finished->value
+        ) {
             $attributes['job_id'] = $job?->getJobId() ?? $this->stage->job_id;
         }
 
