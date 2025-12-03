@@ -22,5 +22,7 @@ class ProcessTest extends TestCase
         ]);
 
         $process = $post->process(TestProcess::class);
+
+        $process->retry();
     }
 }
